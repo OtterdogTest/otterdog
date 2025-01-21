@@ -3,6 +3,8 @@ name: Generate and ingest SBOM into sbom.eclipse.org
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -52,23 +54,3 @@ jobs:
         with:
           name: otterdog-bom.json
           path: otterdog-bom.json
-
-  upload-sbom:
-    if: github.repository == 'eclipse-csi/otterdog'
-    runs-on: ubuntu-latest
-    needs: [ 'generate-sbom' ]
-    steps:
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
-        with:
-          name: otterdog-bom.json
-
-      - uses: DependencyTrack/gh-upload-sbom@48feab3080ff9e8f51f4d21861d9fc914eb744f5 # v3.1.0
-        with:
-          serverHostname: 'sbom.eclipse.org'
-          apiKey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
-          projectName: 'otterdog'
-          projectVersion: ${{ needs.generate-sbom.outputs.project-version }}
-          bomFilename: "otterdog-bom.json"
-          parentName: 'otterdog'
-          parentVersion: 'parent'
-          autoCreate: true
