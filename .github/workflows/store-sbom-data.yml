@@ -8,13 +8,19 @@ on:
         type: string
         required: true
       projectVersion:
-        description: 'The "projectVerison" associated with this sbom.'
+        description: 'The "projectVersion" associated with this sbom.'
         type: string
         required: true
+      bomArtifact:
+        description: 'The artifact name where the sbom is uploaded to.'
+        type: string
+        required: true
+        default: 'sbom'
       bomFilename:
         description: 'The generated bom filename to be uploaded.'
         type: string
         required: true
+        default: 'bom.json'
       parentProject: 
         description: 'The "parentProject" this sbom should be associated with.'
         type: string
@@ -25,7 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      - name: Generate metadata
+      - name: "Download sbom"
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: ${{ inputs.bomArtifact }}
+      - name: "Generate metadata"
         shell: bash
         run: |
           echo "$(cat <<EOT
@@ -35,7 +45,7 @@ jobs:
             "parentProject": "${{ inputs.parentProject }}"
           }
           EOT
-          )" > result.json
+          )" > metadata.json
 
           if [ ! -f ${{ inputs.bomFilename }} ]; then
             echo "Input bom file not found!"
