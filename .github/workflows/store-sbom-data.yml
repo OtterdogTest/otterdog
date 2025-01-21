@@ -1,0 +1,53 @@
+name: Store SBOM Data for ingestion into sbom.eclipse.org
+
+on:
+  workflow_call:
+    inputs:
+      projectName:
+        description: 'The "projectName" associated with this sbom.'
+        type: string
+        required: true
+      projectVersion:
+        description: 'The "projectVerison" associated with this sbom.'
+        type: string
+        required: true
+      bomFilename:
+        description: 'The generated bom filename to be uploaded.'
+        type: string
+        required: true
+      parentProject: 
+        description: 'The "parentProject" this sbom should be associated with.'
+        type: string
+        required: true
+
+jobs:
+  store-sbom-data:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Generate metadata
+        shell: bash
+        run: |
+          echo "$(cat <<EOT
+          {
+            "projectName": "${{ inputs.projectName }}",
+            "projectVersion": "${{ inputs.projectVersion }}",
+            "parentProject": "${{ inputs.parentProject }}"
+          }
+          EOT
+          )" > result.json
+
+          if [ ! -f ${{ inputs.bomFilename }} ]; then
+            echo "Input bom file not found!"
+            exit 1
+          fi
+
+          cp ${{ inputs.bomFilename }} bom.json
+
+      - name: Upload sbom metadata
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: eclipse-sbom-data
+          path: |
+            bom.json
+            metadata.json
