@@ -56,11 +56,11 @@ jobs:
           path: otterdog-bom.json
 
   store-sbom-data: # stores sbom and metadata in a predefined format for otterdog to pick up
-    needs: ["generate-sbom"]
+    needs: ['generate-sbom']
     uses: OtterdogTest/otterdog/.github/workflows/store-sbom-data.yml@main
     with:
       projectName: 'otterdog'
-      projectVersion: ${{ steps.export.outputs.PROJECT_VERSION }}
+      projectVersion: ${{ needs.generate-sbom.outputs.project-version }}
       bomArtifact: 'sbom'
       bomFilename: 'otterdog-bom.json'
       parentProject: 'otterdog'
