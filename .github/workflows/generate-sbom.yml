@@ -63,4 +63,4 @@ jobs:
       projectVersion: ${{ needs.generate-sbom.outputs.project-version }}
       bomArtifact: 'sbom'
       bomFilename: 'otterdog-bom.json'
-      parentProject: 'otterdog'
+      parentProject: 'caa07057-876a-44f9-b162-d2c0684e5dc5'
